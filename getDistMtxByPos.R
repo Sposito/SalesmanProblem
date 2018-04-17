@@ -13,7 +13,7 @@ getDistMtxByPos <- function(pos){
             xJ <- pos[j, 1];
             yJ <- pos[j, 2];
       
-            distances[i,j] = sqrt( (xJ - xI) * (xJ - xI) + (yJ - yI) * (yJ - yI));
+            distances[i,j] = sqrt( (xJ - xI) ** 2 + (yJ - yI) ** 2);
         } 
     }
     return (distances);
@@ -21,6 +21,6 @@ getDistMtxByPos <- function(pos){
 
 # myPos = matrix( c(33,  1,  0,  0,  2, 30, 31, 29, 31, 32, 30, 31,
 #                   30, 31, 29, 31, 32,  0,  1,  0,  0,  2, 30, 31),
-#                 nrow=12, ncol=2, byrow = FALSE);
+#                  nrow=12, ncol=2);
 #  
-# dst = getDistMtxByPos(myPos)
+#  dst = getDistMtxByPos(myPos)
