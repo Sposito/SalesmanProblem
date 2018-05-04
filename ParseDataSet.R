@@ -1,9 +1,14 @@
+#' Parses .dat files in a custom data object
+#' This function accepts a string to the path to the
+#' desired file, if none is provied it toogles a file
+#' chooser window.
 parseData <- function(path = ""){
     if(path == ""){
         filePath <- file.choose()
     }
     
     file = file(filePath, "r")
+    print (filePath)
     
     #    Data Variables
     noOfDepots      <- -1
@@ -26,7 +31,8 @@ parseData <- function(path = ""){
     
     # Number of lines to be read each step
     linesToRead     <-  1
-    
+    posSep <- "\t"
+    #posSep = ";"
     # Reads a given amount of lines until the end of the file
     while(TRUE){
         line = readLines(file, n = linesToRead)
@@ -40,6 +46,11 @@ parseData <- function(path = ""){
         if(line[1] == ""){
             if(!depotsPosDone && noOfDepots > 0){
                 linesToRead <- noOfDepots
+                next
+            }
+            
+            if(length(line) > 1 && !customersPosDone && line[1] == ""){
+                line <- line[2:noOfCustomers+1]
                 next
             }
             
@@ -75,7 +86,8 @@ parseData <- function(path = ""){
         }
         
         if(!depotsPosDone){
-            depotsData <- as.matrix(read.table(textConnection(line), "\t", header = FALSE))
+            depotsData <- as.matrix(read.table(textConnection(line), posSep, header = FALSE))
+            # browser()
             depotsData <- depotsData[1:noOfDepots,1:2]
             colnames(depotsData)[1] <- "X"
             colnames(depotsData)[2] <- "Y"
@@ -86,7 +98,7 @@ parseData <- function(path = ""){
         }
         
         if(!customersPosDone){
-            customersData <- as.matrix(read.table(textConnection(line), "\t", header = FALSE))
+            customersData <- as.matrix(read.table(textConnection(line), posSep, header = FALSE))
             customersData <- customersData[1:noOfCustomers,1:2]
             colnames(customersData)[1] <- "X"
             colnames(customersData)[2] <- "Y"
@@ -139,13 +151,19 @@ parseData <- function(path = ""){
     
     close(file);
     
+    #' Concatanates positions of depots and customers in a single matrix.
+    getAllPos <- function(){
+        return(rbind(depotsData[,1:2], customersData[,1:2]) )
+    }
+    
     dat <- list( noOfDepots = noOfDepots, noOfCustomers = noOfCustomers, vehicleCapacity = vehicleCapacity,
                  vehicleCost = vehicleCost , valueIsDecimal = valueIsDecimal, depotsData = depotsData,
-                 customersData = customersData);
+                 customersData = customersData, getAllPos = getAllPos);
     class(dat) <- "tsmData"
     
     return(dat)
 }
 
-dat <- parseData()
-dp <- dat$depotsData
+#dat = parseData()
+#cstm = dat$customersData
+
